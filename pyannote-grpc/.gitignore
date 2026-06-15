@@ -1,0 +1,94 @@
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# -------------------------
+# Build / Distribution
+# -------------------------
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+
+# -------------------------
+# Testing
+# -------------------------
+.pytest_cache/
+.coverage
+htmlcov/
+
+# -------------------------
+# IDE
+# -------------------------
+.vscode/
+.idea/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# -------------------------
+# Logs
+# -------------------------
+*.log
+
+# -------------------------
+# Jupyter
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# PyAnnote / Hugging Face
+# -------------------------
+.cache/
+huggingface/
+hf_cache/
+
+# Model downloads
+models/
+checkpoints/
+
+# Torch caches
+.torch/
+torch_cache/
+
+# -------------------------
+# Audio files
+# -------------------------
+*.wav
+*.mp3
+*.flac
+*.m4a
+
+# Generated transcripts
+transcripts/
+output/
+
+# -------------------------
+# Environment variables
+# -------------------------
+.env
+.env.*
+
+# -------------------------
+# OS
+# -------------------------
+.DS_Store
+Thumbs.db

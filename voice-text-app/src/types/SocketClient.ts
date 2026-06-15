@@ -1,5 +1,3 @@
-import { AudioChunk } from "./audio-type";
-
 export class SocketClient {
 
     private socket!: WebSocket;

@@ -1,5 +1,7 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
+using VoiceToTextWS.Models;
 
 namespace VoiceToTextWS.Services;
 public class WebSocketHandler(TranscriptionService transcriptionService)
@@ -75,12 +77,47 @@ public class WebSocketHandler(TranscriptionService transcriptionService)
                     bufferQueue.Clear();
 
                     using var wavStream = await WavStream.CreateWavStreamAsync(combinedAudio);
+                    wavStream.Position = 0;
+                    //await TestGrpc.TestGrpcAsync(wavStream); // For testing gRPC with the same audio data
+                    var speakerDiarizationResponse = await AudioDiarizationService.DiarizeAudioAsync(wavStream);
+
+                    foreach (var segment in speakerDiarizationResponse?.SpeakerSegments ?? [])
+                    {
+                        Console.WriteLine($"Speaker: {segment.Speaker}, Start: {segment.Start}, End: {segment.End}");
+                    }
+
+                    foreach(var speaker in speakerDiarizationResponse?.SpeakersInOrder ?? [])
+                    {
+                        Console.WriteLine($"Speaker: {speaker}");
+                    }
+
                     // TODO: send to Whisper / pipeline
                     wavStream.Position = 0;
                     var transcriptionText = await transcriptionService.TranscribeAsync(wavStream);
-                    Console.WriteLine("Transcription: " + transcriptionText);
 
-                    await SendLargeTextAsync(socket, transcriptionText);
+                    foreach (var segment in transcriptionText.Segments.OrderBy(s => s.Start))
+                    {
+                        Console.WriteLine($"Segment start: {segment.Start}, End: {segment.End}, Text: {segment.Text}");
+                    }
+
+                    //Console.WriteLine("Transcription: " + transcriptionText.Text);
+
+                    //await TestGrpc.TestMergeAsync(speakerDiarizationResponse!, transcriptionText); // For testing merging gRPC responses
+
+                    var mergedResult = await DiarizedTranscription.TestMergeAsync(speakerDiarizationResponse!, transcriptionText);
+
+                    foreach (var segment in mergedResult.OrderBy(s => s.Start))
+                    {                        
+                        Console.WriteLine($"Speaker: {segment.Speaker}, Text: {segment.Text}");
+                    }
+
+                    var response = new TranscriptSpeakerResponse
+                    {
+                        Text = transcriptionText.Text,
+                        Segments = mergedResult
+                    };
+
+                    await SendLargeTextAsync(socket, JsonSerializer.Serialize(response));
                     
                     //Console.WriteLine($"Socket state before close: {socket.State}");
                     await socket.CloseOutputAsync(

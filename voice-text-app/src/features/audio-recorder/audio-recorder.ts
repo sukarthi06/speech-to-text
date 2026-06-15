@@ -1,9 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { AudioVisualizer } from '../audio-visualizer/audio-visualizer';
+import { environment } from '../../environments/environment';
+import { AudioTranscript } from '../audio-transcript/audio-transcript';
+import { TranscriptResponse, TranscriptSegment } from '../../types/transcript-segment';
 
 @Component({
   selector: 'app-audio-recorder',
-  imports: [AudioVisualizer],
+  imports: [AudioVisualizer, AudioTranscript],
   templateUrl: './audio-recorder.html',
   styleUrl: './audio-recorder.css',
 })
@@ -23,6 +26,7 @@ export class AudioRecorder implements OnInit {
 
   public transcript = signal('');
   public analyser = signal<AnalyserNode | null>(null);
+  public segments = signal<TranscriptSegment[]>([]);
 
   constructor() {
     // Initialize worker
@@ -34,13 +38,23 @@ export class AudioRecorder implements OnInit {
     this.chunkWorker.onmessage = (event: MessageEvent) => {
       //console.log('Processed chunk from worker:', event.data.message);
       //console.log('Received in component:', event.data);
-      this.transcript.set(this.transcript() + event.data);
+      
+      const data: TranscriptResponse = JSON.parse(event.data);
+      this.transcript.set(this.transcript() + data.Text);
+      this.segments.update(current => [
+        ...current,
+        ...data.Segments.map(s => ({
+          speaker: s.Speaker,
+          text: s.Text
+        }))
+      ]);
+
       this.isProcessingAudio.set(false);
     };
   }
 
-  ngOnInit() {
-    this.chunkWorker.postMessage({ type: 'init' });
+  ngOnInit() {    
+    this.chunkWorker.postMessage({ type: 'init', websocketUrl: environment.websocketUrl });
   }
 
   processAudioChunk(chunk: Float32Array) {    

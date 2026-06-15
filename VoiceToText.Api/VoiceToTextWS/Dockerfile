@@ -12,9 +12,9 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["VoiceToTextWS.Service/VoiceToTextWS/VoiceToTextWS.csproj", "VoiceToTextWS/"]
+COPY ["VoiceToTextWS/VoiceToTextWS.csproj", "VoiceToTextWS/"]
 RUN dotnet restore "./VoiceToTextWS/VoiceToTextWS.csproj"
-COPY ["VoiceToTextWS.Service/VoiceToTextWS/", "VoiceToTextWS/"]
+COPY . .
 WORKDIR "/src/VoiceToTextWS"
 RUN dotnet build "./VoiceToTextWS.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

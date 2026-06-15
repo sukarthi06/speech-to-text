@@ -6,7 +6,7 @@ namespace VoiceToTextWS.Services;
 
 public class TranscriptionService(HttpClient httpClient)
 {
-    public async Task<string> TranscribeAsync(MemoryStream wavStream)
+    public async Task<TranscriptionResponse> TranscribeAsync(MemoryStream wavStream)
     {
         using var content = new MultipartFormDataContent();
 
@@ -17,19 +17,26 @@ public class TranscriptionService(HttpClient httpClient)
         content.Add(new StringContent("whisper-1"), "model");
         content.Add(new StringContent("en"), "language");
 
+        content.Add(new StringContent("verbose_json"), "response_format");
+        content.Add(
+            new StringContent("segment"),
+            "timestamp_granularities[]"
+        );
+
         var response = await httpClient.PostAsync(
             "https://api.openai.com/v1/audio/transcriptions",
             content
         );
 
         var responseString = await response.Content.ReadAsStringAsync();
+        //Console.WriteLine(responseString);
         //Console.WriteLine("Status: " + response.StatusCode);
         //response.EnsureSuccessStatusCode();
 
         return ExtractText(responseString);
     }
 
-    private string ExtractText(string json)
+    private TranscriptionResponse ExtractText(string json)
     {
         var result = JsonSerializer.Deserialize<TranscriptionResponse>(
             json,
@@ -38,7 +45,10 @@ public class TranscriptionService(HttpClient httpClient)
                 PropertyNameCaseInsensitive = true
             }
         );
-        return result?.Text ?? string.Empty;
+        //Console.WriteLine($"Segments: {result?.Segments.Count}");
+        //return result?.Text ?? string.Empty;
+
+        return result ?? new TranscriptionResponse();
     }
     //
     //private string ExtractText(string json) { try { using var doc = JsonDocument.Parse(json); return doc.RootElement.GetProperty("text").GetString()!; } catch { return ""; } }

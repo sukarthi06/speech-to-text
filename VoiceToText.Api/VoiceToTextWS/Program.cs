@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
+using VoiceToTextWS;
 using VoiceToTextWS.Endpoints;
 using VoiceToTextWS.Models;
 using VoiceToTextWS.Services;
@@ -51,5 +52,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapWebSocketEndpoint();
+
+//TestGrpc.TestGrpcAsync().GetAwaiter().GetResult();
 
 app.Run();

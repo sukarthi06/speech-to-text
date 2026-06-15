@@ -7,8 +7,12 @@ public static class WebSocketEndpoint
     {
         app.Map("/ws", async context =>
         {
+            Console.WriteLine("WS endpoint hit");
+
             if (context.WebSockets.IsWebSocketRequest)
             {
+                Console.WriteLine("WebSocket request");
+
                 using var socket =
                     await context.WebSockets.AcceptWebSocketAsync();
 
@@ -21,6 +25,7 @@ public static class WebSocketEndpoint
             }
             else
             {
+                Console.WriteLine("Not a WebSocket request");
                 context.Response.StatusCode = 400;
             }
         });

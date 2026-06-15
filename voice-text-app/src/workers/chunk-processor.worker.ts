@@ -2,6 +2,7 @@
 import { SocketClient } from '../types/SocketClient';
 
 let socketClient: SocketClient | null = null;
+let websocketUrl = '';
 
 addEventListener('message', ({ data }) => {
 
@@ -11,8 +12,9 @@ addEventListener('message', ({ data }) => {
   switch (data.type) {
 
     case 'init':
+      websocketUrl = data.websocketUrl;
       socketClient ??= new SocketClient();
-      socketClient.connect('ws://localhost:5194/ws');
+      socketClient.connect(websocketUrl);
 
       break;
     case 'send':
