@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="PhysicianNotes.Api/PhysicianNotes.Api.csproj" />
+    <Project Path="PhysicianNotes.Application/PhysicianNotes.Application.csproj" Id="97c116a0-1d36-4b4f-ba67-4c7ef5280b5a" />
+    <Project Path="PhysicianNotes.Domain/PhysicianNotes.Domain.csproj" Id="96aca419-3211-4f16-a84b-1ad55d5b58b9" />
+    <Project Path="PhysicianNotes.Infrastructure/PhysicianNotes.Infrastructure.csproj" Id="60fab1d4-97dc-4eb7-9159-0f99930557b8" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>
